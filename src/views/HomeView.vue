@@ -35,16 +35,14 @@ onMounted(() => {
   fillChartData()
 })
 
-const mainStore = useMainStore()
-
-const clientBarItems = computed(() => mainStore.clients.slice(0, 4))
-
-const transactionBarItems = computed(() => mainStore.history)
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionMain>
+      <NotificationBar color="info" :icon="mdiMonitorCellphone">
+        <b>Nota Fiscal Pendente.</b> Clique aqui para finalizar
+      </NotificationBar>
       <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Resumo" main>
 
       </SectionTitleLineWithButton>
@@ -111,22 +109,7 @@ const transactionBarItems = computed(() => mainStore.history)
       </div>
 
 
-
-      <SectionTitleLineWithButton :icon="mdiChartPie" title="Trends overview">
-        <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
-      </SectionTitleLineWithButton>
-
-      <CardBox class="mb-6">
-        <div v-if="chartData">
-          <line-chart :data="chartData" class="h-96" />
-        </div>
-      </CardBox>
-
       <SectionTitleLineWithButton :icon="mdiAccountMultiple" title="Clientes" />
-
-      <NotificationBar color="info" :icon="mdiMonitorCellphone">
-        <b>Responsive table.</b> Collapses on mobile
-      </NotificationBar>
 
       <CardBox has-table>
         <TableSampleClients />

@@ -1,15 +1,41 @@
 <script setup>
 import { reactive, ref } from 'vue'
-import { mdiBallotOutline, mdiAccountPlus, mdiAccountEye } from '@mdi/js'
+import { mdiBallotOutline, mdiAccount, mdiMail, mdiCalendarAccount, mdiCellphone, mdiAt } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
 import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
+import FormFilePicker from '@/components/FormFilePicker.vue'
+import FormField from '@/components/FormField.vue'
+import FormControl from '@/components/FormControl.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
+import BaseButton from '@/components/BaseButton.vue'
+import BaseButtons from '@/components/BaseButtons.vue'
+import SectionTitle from '@/components/SectionTitle.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
+import NotificationBarInCard from '@/components/NotificationBarInCard.vue'
 import TableSampleClients from '@/components/TableSampleClients.vue'
-import BaseButton from '@/components/BaseButton.vue'
 
+const selectOptions = [
+  { id: 1, label: 'Pessoa Física' },
+  { id: 2, label: 'Pessoa Jurídica' },
+  { id: 3, label: 'Estrangeiro(a)' }
+]
+
+const form = reactive({
+  tipoPessoa: selectOptions[0],
+  cpf_cnpj: '',
+  razao_social: '',
+  telefone: '',
+  fantasia: '',
+  data_nascimento: '',
+  rg: '',
+  insc_estadual: '',
+  insc_municipal: '',
+  nacionalidade: '',
+  website: '',
+  obs: ''
+})
 
 const customElementsForm = reactive({
   checkbox: ['lorem'],
@@ -33,29 +59,20 @@ const formStatusSubmit = () => {
     ? formStatusCurrent.value + 1
     : 0
 }
-
-const showForm = reactive({
-  novoCliente: false,
-});
-
-const toggleForm = () => {
-  showForm.novoCliente = !showForm.novoCliente;
-};
 </script>
 
 <template>
   <LayoutAuthenticated >
     <SectionMain class="w-100">
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Cadastro de Cliente" main>
-        <BaseButton v-if="!showForm.novoCliente" @click="toggleForm" label="Novo Cliente" color="success" :icon="mdiAccountPlus"/>
-        <BaseButton v-else @click="toggleForm" label="Ver Clientes" color="info" :icon="mdiAccountEye"/>
+
       </SectionTitleLineWithButton>
 
-      <CardBox v-if="!showForm.novoCliente" has-table>
+      <CardBox has-table>
         <TableSampleClients />
       </CardBox>
 
-      <CardBox form v-if="showForm.novoCliente" @submit.prevent="submit" >
+      <CardBox form @submit.prevent="submit" >
         <div class="w-1/2 mx-auto">
             <FormKit type="form" :actions="false" >
             <FormKit type="multi-step" tab-style="progress" :allow-incomplete="false">

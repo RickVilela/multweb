@@ -3,17 +3,9 @@ import { reactive, ref } from 'vue'
 import { mdiBallotOutline, mdiAccount, mdiMail, mdiGithub } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
-import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
-import FormFilePicker from '@/components/FormFilePicker.vue'
-import FormField from '@/components/FormField.vue'
-import FormControl from '@/components/FormControl.vue'
-import BaseDivider from '@/components/BaseDivider.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import BaseButtons from '@/components/BaseButtons.vue'
-import SectionTitle from '@/components/SectionTitle.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-import NotificationBarInCard from '@/components/NotificationBarInCard.vue'
 
 const selectOptions = [
   { id: 1, label: 'Business development' },
@@ -57,113 +49,266 @@ const formStatusSubmit = () => {
 <template>
   <LayoutAuthenticated>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Forms example" main>
-        <BaseButton
-          href="https://github.com/justboil/admin-one-vue-tailwind"
-          target="_blank"
-          :icon="mdiGithub"
-          label="Star on GitHub"
-          color="contrast"
-          rounded-full
-          small
-        />
+      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Cadastro de Fornecedor" main>
+
       </SectionTitleLineWithButton>
       <CardBox form @submit.prevent="submit">
-        <FormField label="Grouped with icons">
-          <FormControl v-model="form.name" :icon="mdiAccount" />
-          <FormControl v-model="form.email" type="email" :icon="mdiMail" />
-        </FormField>
-
-        <FormField label="With help line" help="Do not enter the leading zero">
-          <FormControl v-model="form.phone" type="tel" placeholder="Your phone number" />
-        </FormField>
-
-        <FormField label="Dropdown">
-          <FormControl v-model="form.department" :options="selectOptions" />
-        </FormField>
-
-        <BaseDivider />
-
-        <FormField label="Question" help="Your question. Max 255 characters">
-          <FormControl type="textarea" placeholder="Explain how we can help you" />
-        </FormField>
-
-        <template #footer>
-          <BaseButtons>
-            <BaseButton type="submit" color="info" label="Submit" />
-            <BaseButton type="reset" color="info" outline label="Reset" />
-          </BaseButtons>
-        </template>
-      </CardBox>
-    </SectionMain>
-
-    <SectionTitle>Custom elements</SectionTitle>
-
-    <SectionMain>
-      <CardBox>
-        <FormField label="Checkbox">
-          <FormCheckRadioGroup
-            v-model="customElementsForm.checkbox"
-            name="sample-checkbox"
-            :options="{ lorem: 'Lorem', ipsum: 'Ipsum', dolore: 'Dolore' }"
+        <Vueform>
+    <template #empty>
+      <FormTabs>
+        <FormTab
+          name="informacoes_principais"
+          label="Informações Principais"
+          :elements="['pessoa', 'cpf_cnpj', 'razao_nome', 'apelido_fantasia', 'data_nascimento', 'rg', 'insc_estadual', 'insc_municipal', 'nacionalidade', 'website', 'observacoes']"
           />
-        </FormField>
+        <FormTab
+          name="enderecos"
+          label="Endereços"
+          :elements="['cep', 'logradouro', 'numero', 'bairro', 'complemento', 'cidade', 'ibge_cidade', 'uf', 'pais', 'ibge_pais' ,'tipo_endereco']"
+        />
+        <FormTab
+          name="telefones"
+          label="Telefones"
+          :elements="['questions']"
+        />
+      </FormTabs>
 
-        <BaseDivider />
+      <FormElements>
+        <SelectElement
+          name="pessoa"
+          label="Pessoa"
+          :native="false"
+          :items="[
+            'Física',
+            'Jurídica',
+            'Estrageiro(a)',
+          ]"
+          :columns="6"
+        />
 
-        <FormField label="Radio">
-          <FormCheckRadioGroup
-            v-model="customElementsForm.radio"
-            name="sample-radio"
-            type="radio"
-            :options="{ one: 'One', two: 'Two' }"
-          />
-        </FormField>
+        <TextElement
+          name="cpf_cnpj"
+          label="CNPJ/CPF"
+          :columns="6"
+        />
 
-        <BaseDivider />
+        <TextElement
+          name="razao_nome"
+          label="Razao Social/Nome"
+          :columns="6"
+        />
 
-        <FormField label="Switch">
-          <FormCheckRadioGroup
-            v-model="customElementsForm.switch"
-            name="sample-switch"
-            type="switch"
-            :options="{ one: 'One', two: 'Two' }"
-          />
-        </FormField>
+        <TextElement
+          name="apelido_fantasia"
+          label="Apelido / Nome Fantasia"
+          :columns="6"
+        />
 
-        <BaseDivider />
+        <DateElement
+          name="data_nascimento"
+          label="Data de Nascimento"
+          :columns="4"
+        />
 
-        <FormFilePicker v-model="customElementsForm.file" label="Upload" />
-      </CardBox>
+        <TextElement
+          name="rg"
+          label="RG"
+          :columns="4"
+        />
 
-      <SectionTitle>Form with status example</SectionTitle>
+        <TextElement
+          name="insc_estadual"
+          label="Insc.Estadual"
+          :columns="4"
+        />
 
-      <CardBox
-        class="md:w-7/12 lg:w-5/12 xl:w-4/12 shadow-2xl md:mx-auto"
-        is-form
-        is-hoverable
-        @submit.prevent="formStatusSubmit"
-      >
-        <NotificationBarInCard
-          :color="formStatusOptions[formStatusCurrent]"
-          :is-placed-with-header="formStatusWithHeader"
+        <TextElement
+          name="insc_municipal"
+          label="Insc.Municipal"
+          :columns="4"
+        />
+
+        <TextElement
+          name="nacionalidade"
+          label="Nacionalidade"
+          :columns="4"
+        />
+
+        <TextElement
+          name="website"
+          label="Website"
+          :columns="4"
+        />
+
+        <EditorElement name="observacoes" label="Observações" />
+
+
+        <TextElement
+          name="cep"
+          label="CEP"
+          :columns="4"
+        />
+
+        <TextElement
+          name="logradouro"
+          label="Logradouro"
+          :columns="4"
+        />
+
+        <TextElement
+          name="numero"
+          input-type="number"
+          label="Nº"
+          :columns="4"
+        />
+
+        <TextElement
+          name="bairro"
+          label="Bairro"
+          :columns="6"
+        />
+
+        <TextElement
+          name="complemento"
+          label="Complemento"
+          :columns="6"
+        />
+
+        <TextElement
+          name="cidade"
+          label="Cidade"
+          :columns="3"
+        />
+
+        <TextElement
+          name="ibge_cidade"
+          label="IBGE Cidade"
+          :columns="3"
+        />
+
+        <TextElement
+          name="uf"
+          label="UF"
+          :columns="3"
+        />
+
+        <TextElement
+          name="pais"
+          label="Pais"
+          :columns="3"
+        />
+
+        <TextElement
+          name="ibge_pais"
+          label="IBGE Pais"
+          :columns="3"
+        />
+
+        <SelectElement
+          name="tipo_endereco"
+          label="Tipo"
+          :native="false"
+          :items="[
+            'Faturamento',
+            'Entrega',
+            'Residência',
+          ]"
+          :columns="6"
+        />
+
+        <ListElement
+          name="questions"
+          add-text="+"
+          :sort="true"
+          :override-classes="{
+            ListElement: {
+              add: 'bg-green-500 w-10 h-10 text-white flex items-center justify-center text-xl font-bold mx-auto rounded-full',
+              add_md: '',
+            }
+          }"
         >
-          <span
-            ><b class="capitalize">{{ formStatusOptions[formStatusCurrent] }}</b> state</span
-          >
-        </NotificationBarInCard>
-        <FormField label="Fields">
-          <FormControl
-            v-model="form.name"
-            :icon-left="mdiAccount"
-            help="Your full name"
-            placeholder="Name"
-          />
-        </FormField>
+        <template #default="{ index }">
 
-        <template #footer>
-          <BaseButton label="Trigger" type="submit" color="info" />
+          <!-- One question -->
+          <ObjectElement
+            :name="index"
+            add-class="mb-4"
+            :override-classes="{
+              ElementLayout: {
+                outerWrapper: 'flex flex-wrap',
+                innerWrapper: 'bg-white rounded-lg py-8 px-10 shadow-box-circle',
+              }
+            }"
+          >
+            <!-- Question title -->
+            <StaticElement name="title">
+              <div class="text-xl mb-4 font-semibold">Telefone {{ index + 1 }}</div>
+            </StaticElement>
+
+            <!-- Question -->
+            <TextElement
+              name="label"
+              label="Telefone"
+              placeholder="Número"
+              :columns="3"
+            />
+
+            <SelectElement
+              name="tipo_telefone"
+              label="Tipo"
+              :native="false"
+              :items="[
+                'Whatsapp',
+                'Celular',
+                'Telefone',
+              ]"
+              :columns="3"
+            />
+
+            <!-- Question description -->
+            <TextElement
+              name="contato"
+              label="Contato"
+              :columns="3"
+            />
+
+            <TextElement
+              name="departamento"
+              label="Departamento"
+              :columns="3"
+            />
+
+
+
+
+            <!-- Answer options (if any) -->
+            <ListElement
+              name="items"
+              label="Options"
+              add-text="+ Add option"
+              :conditions="[
+                ['questions.*.type', ['select', 'checkboxgroup', 'radiogroup']]
+              ]"
+            >
+              <template #default="{ index }">
+                <TextElement :name="index" />
+              </template>
+            </ListElement>
+          </ObjectElement>
         </template>
+      </ListElement>
+
+        <TextElement
+          name="facebook"
+          label="Facebook"
+        />
+        <TextElement
+          name="twitter"
+          label="Twitter"
+        />
+      </FormElements>
+    </template>
+  </Vueform>
       </CardBox>
     </SectionMain>
   </LayoutAuthenticated>

@@ -16,6 +16,7 @@
     "@vueform/vueform": "^1.7.2",
     "axios": "^1.5.0",
     "chart.js": "^4.4.0",
+    "formvuelar": "^1.8.9",
     "numeral": "^2.0.6",
     "pinia": "^2.1.6",
     "vue": "^3.3.4",

@@ -34,9 +34,27 @@ const routes = [
       title: 'Cadastro de Fornecedor'
     },
     path: '/cadastro/fornecedor',
-    name: 'cadastro de forncedores',
+    name: 'cadastro de fornecedores',
     component: () => import('@/views/CadFornecedor.vue')
   },
+  {
+    meta: {
+      title: 'Cadastro de Funcionários'
+    },
+    path: '/cadastro/funcionario',
+    name: 'cadastro de funcionarios',
+    component: () => import('@/views/CadFuncionario.vue')
+  },
+
+  {
+    meta: {
+      title: 'Cadastro de Usuários'
+    },
+    path: '/cadastro/usuario',
+    name: 'cadastro de usuarios',
+    component: () => import('@/views/CadUsuario.vue')
+  },
+
   {
     meta: {
       title: 'Forms'

@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
 import App from './App.vue'
+import Vueform from '@vueform/vueform'
+import vueformConfig from './../vueform.config'
 import router from './router'
 import { useMainStore } from '@/stores/main.js'
 
@@ -19,6 +21,7 @@ const pinia = createPinia()
 
 // Create Vue app
 createApp(App)
+  .use(Vueform, vueformConfig)
   .use(router)
   .use(pinia)
   .use(formKitPlugin, defaultConfig({
