@@ -1,28 +1,17 @@
 <script setup>
 import { reactive, ref } from 'vue'
-import { mdiBallotOutline, mdiAccountPlus, mdiAccountEye } from '@mdi/js'
+import { mdiBallotOutline, mdiAccountEye, mdiAccountPlus } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
-import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
-import BaseDivider from '@/components/BaseDivider.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import TableSampleClients from '@/components/TableSampleClients.vue'
 import BaseButton from '@/components/BaseButton.vue'
-
-
-const customElementsForm = reactive({
-  checkbox: ['lorem'],
-  radio: 'one',
-  switch: ['one'],
-  file: null
-})
+import BtnSubmit from '@/components/BtnSubmit.vue'
 
 const submit = () => {
   //
 }
-
-const formStatusWithHeader = ref(true)
 
 const formStatusCurrent = ref(0)
 
@@ -35,260 +24,292 @@ const formStatusSubmit = () => {
 }
 
 const showForm = reactive({
-  novoCliente: false,
+  novoFornecedor: false,
 });
 
 const toggleForm = () => {
-  showForm.novoCliente = !showForm.novoCliente;
+  showForm.novo = !showForm.novo;
 };
 </script>
 
 <template>
-  <LayoutAuthenticated >
-    <SectionMain class="w-100">
+  <LayoutAuthenticated>
+    <SectionMain>
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Cadastro de Cliente" main>
-        <BaseButton v-if="!showForm.novoCliente" @click="toggleForm" label="Novo Cliente" color="success" :icon="mdiAccountPlus"/>
+        <BaseButton v-if="!showForm.novo" @click="toggleForm" label="Novo Cliente" color="success" :icon="mdiAccountPlus"/>
         <BaseButton v-else @click="toggleForm" label="Ver Clientes" color="info" :icon="mdiAccountEye"/>
       </SectionTitleLineWithButton>
 
-      <CardBox v-if="!showForm.novoCliente" has-table>
+      <CardBox v-if="!showForm.novo" has-table>
         <TableSampleClients />
       </CardBox>
 
-      <CardBox form v-if="showForm.novoCliente" @submit.prevent="submit" >
-        <div class="w-1/2 mx-auto">
-            <FormKit type="form" :actions="false" >
-            <FormKit type="multi-step" tab-style="progress" :allow-incomplete="false">
-              <FormKit type="step" name="contactInformation" label="Informações Principais">
-                <!-- collect name, email, and company info -->
-                <FormKit
-                  type="select"
-                  label="Pessoa"
-                  prefix-icon="people"
-                  placeholder="Selecione o Tipo de Pessoa"
-                  name="tipo_pessoa"
-                  :options="{
-                    fisica: 'Física',
-                    juridica: 'Jurídica',
-                    estrangeiro: 'Estrangeiro(a)',
-                  }"
-                  validation="required"
-                  validation-visibility="dirty"
-                />
-                <FormKit type="text" label="CPF / CNPJ / Documento"/>
-                <FormKit type="text" label="Razão Social / Nome" validation="required"/>
-                <FormKit type="text" label="Apelido / Nome Fantasia"/>
-                <FormKit type="date" label="Data de Nascimento"/>
-                <FormKit type="text" label="RG"/>
-                <FormKit type="text" label="Insc.Estadual"/>
-                <FormKit type="text" label="Insc.Municipal"/>
-                <FormKit type="text" label="Nacionalidade"/>
-              </FormKit>
+      <CardBox form v-if="showForm.novo" @submit.prevent="submit" >
+        <Vueform>
+          <template #empty>
+            <FormTabs class="overflow-x-auto text-base sm:text-sm md:text-base lg:text-lg whitespace-nowrap">
+              <FormTab name="informacoes_principais" label="Informações Principais"
+                :elements="['pessoa', 'cpf_cnpj', 'razao_nome', 'apelido_fantasia', 'data_nascimento', 'rg', 'insc_estadual', 'insc_municipal', 'nacionalidade', 'website', 'observacoes', 'button_submit']"
+                :columns="{ sm: 12, md: 6, lg: 4 }" />
 
-              <FormKit type="step" name="endereco" label="Endereços">
-                <!-- Get talk title, brief, and track -->
-                <FormKit type="text" label="CEP" validation="required" />
-                <FormKit type="text" label="Logradouro" validation="required" />
-                <FormKit type="text" label="Nº" validation="required" />
-                <FormKit type="text" label="Bairro" validation="required" />
-                <FormKit type="text" label="Complemento"/>
-                <FormKit type="text" label="Cidade" validation="required" />
-                <FormKit type="text" label="IBGE Cidade"/>
-                <FormKit type="text" label="UF" validation="required" />
-                <FormKit type="text" label="Pais" validation="required" value="Brasil"/>
-                <FormKit type="text" label="IBGE Pais" value="1058"/>
-                <FormKit
-                  type="select"
-                  label="Tipo de Endereço"
-                  placeholder="Selecione o Tipo de Endereço"
-                  name="tipo_endereco"
-                  :options="{
-                    padrao: 'Padrão',
-                    entrega: 'Entrega',
-                    coleta: 'Coleta',
-                    redespacho: 'Redespacho',
-                    cobranca: 'Cobrança',
-                    retorno: 'Retorno',
-                    internacional: 'Internacional',
-                  }"
-                  validation="required"
-                  validation-visibility="dirty"
-                />
-              </FormKit>
+              <FormTab name="enderecos" label="Endereços"
+                :elements="['cep', 'logradouro', 'numero', 'bairro', 'complemento', 'cidade', 'ibge_cidade', 'uf', 'pais', 'ibge_pais', 'tipo_endereco', 'button_submit']"
+                :columns="{ sm: 12, md: 6, lg: 4 }" />
+              <FormTab name="telefones" label="Telefones" :elements="['telefones', 'button_submit']" :columns="{ sm: 12, md: 6, lg: 4 }" />
 
-              <FormKit type="step" name="outros_dados" label="Outros Dados">
-                <!-- Get talk title, brief, and track -->
-                <FormKit type="email" label="E-mail Principal" validation="required|email" prefix-icon="email" />
-                <FormKit type="email" label="E-mail Financeiro" validation="required|email" prefix-icon="email" />
-                <FormKit type="email" label="E-mail NFe" validation="required|email" prefix-icon="email" />
+              <FormTab name="email" label="E-mail" :elements="['email','button_submit']" :columns="{ sm: 12, md: 6, lg: 4 }" />
 
-                  <FormCheckRadioGroup
-                    v-model="customElementsForm.switch"
-                    name="sample-switch"
-                    type="switch"
-                    :options="{ one: 'Notificações por e-mail (E-mail Principal)'}"
-                  />
+              <FormTab name="dados_adicionais" label="Dados Adicionais"
+                :elements="['condicao_pagamento', 'tipo_pagamento', 'regiao', 'transportadoras', 'regiao_suframa', 'cod_ean','button_submit']"
+                :columns="{ sm: 12, md: 6, lg: 4 }" />
 
-                  <BaseDivider />
+              <FormTab name="dados_financeiros" label="Dados Financeiros" :elements="['dados_financeiros', 'button_submit']"
+                :columns="{ sm: 12, md: 6, lg: 4 }" />
 
-                <FormKit
-                  type="tel"
-                  label="Telefone"
-                  prefix-icon="telephone"
-                  placeholder="(xx) xxxxx-xxxx"
-                  validation="matches:^\([0-9]{2}\) [0-9][0-9]{4,4}-[0-9]{4}$"
-                  :validation-messages="{
-                    matches: 'O número de telefone deve ter o seguinte formato: (XX) XXXXX-XXXXX',
-                  }"
-                  validation-visibility="dirty"
-                />
+              <FormTab name="configuracoes" label="Configurações"
+                :elements="['situacao', 'tipo_contribuinte', 'finalidade_faturamento', 'aliquota_carga_tributaria', 'plano_contas', 'button_submit']"
+                :columns="{ sm: 12, md: 6, lg: 4 }" />
+              </FormTabs>
 
-                <FormKit
-                  type="tel"
-                  label="Whatsapp"
-                  prefix-icon="whatsapp"
-                  placeholder="(xx) xxxxx-xxxx"
-                  validation="matches:^\([0-9]{2}\) [0-9][0-9]{4,4}-[0-9]{4}$"
-                  :validation-messages="{
-                    matches: 'O número de whatsapp deve ter o seguinte formato: (XX) XXXXX-XXXXX',
-                  }"
-                  validation-visibility="dirty"
-                />
 
-                <FormKit
-                  type="select"
-                  label="Condição de Pagamento"
-                  prefix-icon="mastercard"
-                  placeholder="Selecione a Condição de Pagamento"
-                  name="condicao_pagamento"
-                  :options="{
-                    a_vista: 'Á Vista - Carteira',
-                    boleto: 'Boleto',
-                  }"
-                  validation-visibility="dirty"
-                />
+            <FormElements>
+              <!-- Início Informações Principais-->
+                <SelectElement name="pessoa" label="Pessoa" rules="required" :messages="{ required: 'Por favor, selecione uma Opção' }" :native="false" :items="[
+                  'Física',
+                  'Jurídica',
+                  'Estrageiro(a)',
+                ]" :columns="6" />
 
-                <FormKit
-                  type="select"
-                  label="Tipos de Pagamentos"
-                  placeholder="Selecione o tipo de Pagamento"
-                  name="regiao"
-                  :options="{
-                    dinheiro: 'Dinheiro',
-                    boleto: 'Boleto',
-                    duplicata: 'Duplicata',
-                    cheque: 'Cheque',
-                    cartao_debito: 'Cartão Débito',
-                    cartao_credito: 'Cartão Credito',
-                    pix: 'Pix'
-                  }"
-                  validation-visibility="dirty"
-                />
+                <TextElement name="cpf_cnpj" label="CNPJ/CPF" :columns="6" />
 
-                <FormKit
-                  type="select"
-                  label="Região"
+                <TextElement name="razao_nome" label="Razao Social/Nome" :columns="6" />
 
-                  placeholder="Selecione a Região"
-                  name="regiao"
-                  :options="{
-                    regiao: 'Limeira e Região',
-                  }"
-                  validation-visibility="dirty"
-                />
+                <TextElement name="apelido_fantasia" label="Apelido / Nome Fantasia" :columns="6" />
 
-                <FormKit type="text" label="Região Suframa" />
-                <FormKit type="text" label="Cód. do EAN Comprador" />
+                <DateElement name="data_nascimento" label="Data de Nascimento" :columns="4" />
 
-                <FormKit
-                  type="select"
-                  label="Transportadoras"
-                  placeholder="Selecione a Transportadora"
-                  name="transportadora"
-                  :options="{
-                    transportadora1: 'Taubate transportes',
-                  }"
-                  validation-visibility="dirty"
-                />
+                <TextElement name="rg" label="RG" :columns="4" />
 
-              </FormKit>
+                <TextElement name="insc_estadual" label="Insc.Estadual" :columns="4" />
 
-              <FormKit type="step" name="referral" label="Configurações">
-                <FormKit
-                  type="select"
-                  label="Situação"
-                  placeholder="Selecione a Situação"
-                  name="situacao"
-                  :options="{
-                    ativo: 'Ativo',
-                    inativo: 'Inativo',
-                    prospect: 'Prospect',
-                  }"
-                  validation="required"
-                  validation-visibility="dirty"
-                />
+                <TextElement name="insc_municipal" label="Insc.Municipal" :columns="4" />
 
-                <FormKit
-                  type="select"
-                  label="Tipo Contribuinte"
-                  placeholder="Selecione o tipo de Contribuinte"
-                  name="tipo_contribuinte"
-                  :options="{
-                    nao_contribuinte: 'Não contribuinte que pode ou não possuir Inscrição Estadual',
-                    contribuinte_isento: 'Contribuinte Isento de Inscrição',
-                    contribuinte_icms: 'Contribuinte ICMS',
-                  }"
-                  validation="required"
-                  validation-visibility="dirty"
-                />
+                <TextElement name="nacionalidade" label="Nacionalidade" :columns="4" />
 
-                <FormKit
-                  type="select"
-                  label="Finalidade Faturamento"
-                  placeholder="Selecione a Finalidade de Faturamento"
-                  name="finalidade_faturamento"
-                  :options="{
-                    revenda: 'Revenda',
-                    consumo: 'Consumo',
-                    amostra: 'Amostra',
-                    devolucao_compra_revenda: 'Devolução de Compra para Revenda (à Fornecedor)',
-                    devolucao_compra_industrializacao: 'Devolução de Compra para Industrialização (à Fornecedor)',
-                    bonificacao_cliente: 'Bonificação ao Cliente',
-                    industrializacao_cliente: 'Industrialização ao Cliente',
-                    remessa_industrializacao: 'Remessa para Industrialização (à Fornecedor)',
-                    remessa_conserto: 'Remessa para Conserto (à Fornecedor)',
-                    retorno_industrializacao: 'Retorno de Industrialização (ao Cliente)',
-                    retorno_conserto: 'Retorno de Conserto (ao Cliente)',
-                    nf_complementar_cliente: 'NF Complementar à Cliente',
-                    nf_complementar_fornecedor: 'NF Complementar à Fornecedor',
-                    remessa_demonstracao_cliente: 'Remessa em Demonstração (ao Cliente)',
-                    remessa_demonstracao_fornecedor: 'Remessa em Demonstração (ao Fornecedor)',
-                    devolucao_compra: 'Devolução de Compra para consumo',
-                  }"
-                  validation-visibility="dirty"
-                />
+                <TextElement name="website" label="Website" :columns="4" />
 
-                <FormKit type="number" label="Alíquota Carga Tributária Média" />
+                <EditorElement name="observacoes" label="Observações" />
+              <!-- Fim Informações Principais-->
 
-                <FormKit
-                  type="select"
-                  label="Plano de Contas"
-                  placeholder="Selecione o plano de contas"
-                  name="plano_contas"
-                  :options="{
-                    venda: 'Venda à Vista',
+              <!-- Início Endereços-->
+                <TextElement name="cep" label="CEP" :columns="4" />
 
-                  }"
-                  validation-visibility="dirty"
-                />
+                <TextElement name="logradouro" label="Logradouro" :columns="4" />
 
-                <template #stepNext>
-                  <FormKit type="submit" />
-                </template>
-              </FormKit>
-            </FormKit>
-          </FormKit>
-        </div>
+                <TextElement name="numero" input-type="number" label="Nº" :columns="4" />
+
+                <TextElement name="bairro" label="Bairro" :columns="6" />
+
+                <TextElement name="complemento" label="Complemento" :columns="6" />
+
+                <TextElement name="cidade" label="Cidade" :columns="3" />
+
+                <TextElement name="ibge_cidade" label="IBGE Cidade" :columns="3" />
+
+                <TextElement name="uf" label="UF" :columns="3" />
+
+                <TextElement name="pais" label="Pais" :columns="3" />
+
+                <TextElement name="ibge_pais" label="IBGE Pais" :columns="3" />
+
+                <SelectElement name="tipo_endereco" label="Tipo" rules="required" :messages="{ required: 'Por favor, selecione uma Opção' }" :native="false" :items="[
+                  'Faturamento',
+                  'Entrega',
+                  'Residência',
+                ]" :columns="6" />
+              <!-- Fim Endereços-->
+
+              <!-- Início Telefones-->
+                <ListElement name="telefones" add-text="+" :sort="true" :override-classes="{
+                  ListElement: {
+                    add: 'bg-green-500 w-10 h-10 text-white flex items-center justify-center text-xl font-bold mx-auto rounded-full',
+                    add_md: '',
+                  }
+                }">
+                  <template #default="{ index }">
+                      <ObjectElement :name="index" add-class="mb-4" :override-classes="{
+                        ElementLayout: {
+                          outerWrapper: 'flex flex-wrap',
+                          innerWrapper: 'bg-white rounded-lg py-8 px-10 shadow-box-circle',
+                        }
+                      }">
+                      <StaticElement name="title">
+                        <div class="text-xl mb-4 font-semibold">Telefone {{ index + 1 }}</div>
+                      </StaticElement>
+
+                      <TextElement name="label" label="Telefone" placeholder="Número" :columns="3" />
+
+                      <SelectElement name="tipo_telefone" label="Tipo" :search="true" :native="false" :items="[
+                        'Whatsapp',
+                        'Celular',
+                        'Telefone',
+                      ]" :columns="3" />
+
+                      <TextElement name="contato" label="Contato" :columns="3" />
+
+                      <TextElement name="departamento" label="Departamento" :columns="3" />
+
+                      <ListElement name="items" label="Options" add-text="+ Add option" :conditions="[
+                        ['questions.*.type', ['select', 'checkboxgroup', 'radiogroup']]
+                      ]">
+                        <template #default="{ index }">
+                          <TextElement :name="index" />
+                        </template>
+                      </ListElement>
+                    </ObjectElement>
+                  </template>
+                </ListElement>
+              <!-- Fim Telefones-->
+
+              <!-- Início E-mail -->
+                <ListElement name="email" add-text="+" :sort="true" :override-classes="{
+                  ListElement: {
+                    add: 'bg-green-500 w-10 h-10 text-white flex items-center justify-center text-xl font-bold mx-auto rounded-full',
+                    add_md: '',
+                  }
+                }">
+                  <template #default="{ index }">
+
+                    <ObjectElement :name="index" add-class="mb-4" :override-classes="{
+                      ElementLayout: {
+                        outerWrapper: 'flex flex-wrap',
+                        innerWrapper: 'bg-white rounded-lg py-8 px-10 shadow-box-circle',
+                      }
+                    }">
+
+                      <StaticElement name="title">
+                        <div class="text-xl mb-4 font-semibold">E-mail {{ index + 1 }}</div>
+                      </StaticElement>
+
+                      <TextElement name="email_principal" label="E-mail Principal" :columns="4" />
+
+                      <TextElement name="email_financeiro" label="E-mail Financeiro" :columns="4" />
+
+                      <TextElement name="email_nfe" label="E-mail NFe" :columns="4" />
+
+                      <ListElement name="items" label="Options" add-text="+ Add option" :conditions="[
+                        ['questions.*.type', ['select', 'checkboxgroup', 'radiogroup']]
+                      ]">
+                        <template #default="{ index }">
+                          <TextElement :name="index" />
+                        </template>
+                      </ListElement>
+                    </ObjectElement>
+                  </template>
+                </ListElement>
+              <!-- Fim E-mail-->
+
+              <!--Início Dados Adicionais-->
+                  <SelectElement name="condicao_pagamento" label="Condição de Pagamento" :search="true" :native="false" :items="[
+                    '',
+
+                  ]" :columns="6" />
+
+                  <SelectElement name="tipo_pagamento" label="Tipos de Pagamentos" :search="true" :native="false" :items="[
+                    '',
+                  ]" :columns="6" />
+
+                  <SelectElement name="regiao" label="Região" :search="true" :native="false" :items="[
+                    '',
+                  ]" :columns="6" />
+
+                  <SelectElement name="transportadoras" label="Transportadoras" :search="true" :native="false" :items="[
+                    '',
+                  ]" :columns="6" />
+
+                  <TextElement name="regiao_suframa" label="Região Suframa"  :columns="6" />
+
+                  <TextElement name="cod_ean" label="Cód. do EAN Comprador"  :columns="6" />
+              <!-- Fim  Dados Adicionais-->
+
+              <!--Início Dados Financeiros-->
+                <ListElement name="dados_financeiros" add-text="+" :sort="true" :override-classes="{
+                  ListElement: {
+                    add: 'bg-green-500 w-10 h-10 text-white flex items-center justify-center text-xl font-bold mx-auto rounded-full',
+                    add_md: '',
+                  }
+                }">
+                  <template #default="{ index }">
+                    <ObjectElement :name="index" add-class="mb-4" :override-classes="{
+                      ElementLayout: {
+                        outerWrapper: 'flex flex-wrap',
+                        innerWrapper: 'bg-white rounded-lg py-8 px-10 shadow-box-circle',
+                      }
+                    }">
+
+                      <StaticElement name="title">
+                        <div class="text-xl mb-4 font-semibold">Conta Bancária {{ index + 1 }}</div>
+                      </StaticElement>
+
+                      <TextElement name="descricao" label="Descrição" :columns="6" />
+
+                      <SelectElement name="banco" label="Banco" :search="true" :native="false" :items="[
+                        '',
+                      ]" :columns="6" />
+
+                      <TextElement name="agencia" label="Agência" :columns="3" />
+
+                      <TextElement name="digito_agencia" label="Digito da Agência" :columns="3" />
+
+                      <TextElement name="conta" label="Conta" :columns="3" />
+
+                      <TextElement name="digito_conta" label="Digito da Conta" :columns="3" />
+
+                      <SelectElement name="tipo" label="Tipo" :search="true" :native="false" :items="[
+                        '',
+                      ]" :columns="12" />
+
+                      <ListElement name="items" label="Options" add-text="+ Add option" :conditions="[
+                        ['questions.*.type', ['select', 'checkboxgroup', 'radiogroup']]
+                      ]">
+                        <template #default="{ index }">
+                          <TextElement :name="index" />
+                        </template>
+                      </ListElement>
+                    </ObjectElement>
+                  </template>
+                </ListElement>
+              <!--Fim Dados Financeiros-->
+
+              <!--Início Configurações-->
+                <SelectElement name="situacao" default="Ativo" label="Situação" rules="required" :messages="{ required: 'Por favor, selecione uma Opção' }" :native="false" :items="[
+                  'Ativo',
+                  'Inativo'
+                ]" :columns="6" />
+
+                <SelectElement name="tipo_contribuinte" :search="true" rules="required" :messages="{ required: 'Por favor, selecione uma Opção' }" label="Tipo contribuinte" :native="false" :items="[
+                  'Não contribuinte, que pode ou não possuir Inscrição Estadual',
+                  'Contribuinte isento de inscrição',
+                  'Contribuinte de ICMS'
+                ]" :columns="6" />
+
+                <SelectElement name="finalidade_faturamento" :search="true" label="Finalidade Faturamento" :native="false" :items="[
+                  'Revenda',
+                  'Consumo',
+                  'Industrialização',
+                  'Devolução'
+                ]" :columns="4" />
+
+                <TextElement name="aliquota_carga_tributaria" label="Alíquota Carga Tributária Média" input-type="number" :columns="4" />
+
+                <SelectElement name="plano_contas" label="Plano de Contas" :native="false" :items="[
+                  ''
+                ]" :columns="4" />
+              <!--Fim Configurações-->
+              <BtnSubmit/>
+            </FormElements>
+          </template>
+        </Vueform>
       </CardBox>
     </SectionMain>
   </LayoutAuthenticated>
