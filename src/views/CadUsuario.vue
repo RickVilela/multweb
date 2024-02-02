@@ -1,54 +1,18 @@
 <script setup>
 import { reactive, ref } from 'vue'
-import { mdiBallotOutline, mdiAccount, mdiMail, mdiCalendarAccount, mdiCellphone, mdiAt } from '@mdi/js'
+import { mdiBallotOutline, mdiAccountEye, mdiAccountPlus } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
-import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
-import FormFilePicker from '@/components/FormFilePicker.vue'
-import FormField from '@/components/FormField.vue'
-import FormControl from '@/components/FormControl.vue'
-import BaseDivider from '@/components/BaseDivider.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import BaseButtons from '@/components/BaseButtons.vue'
-import SectionTitle from '@/components/SectionTitle.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-import NotificationBarInCard from '@/components/NotificationBarInCard.vue'
 import TableSampleClients from '@/components/TableSampleClients.vue'
-
-const selectOptions = [
-  { id: 1, label: 'Pessoa Física' },
-  { id: 2, label: 'Pessoa Jurídica' },
-  { id: 3, label: 'Estrangeiro(a)' }
-]
-
-const form = reactive({
-  tipoPessoa: selectOptions[0],
-  cpf_cnpj: '',
-  razao_social: '',
-  telefone: '',
-  fantasia: '',
-  data_nascimento: '',
-  rg: '',
-  insc_estadual: '',
-  insc_municipal: '',
-  nacionalidade: '',
-  website: '',
-  obs: ''
-})
-
-const customElementsForm = reactive({
-  checkbox: ['lorem'],
-  radio: 'one',
-  switch: ['one'],
-  file: null
-})
+import BaseButton from '@/components/BaseButton.vue'
+import BtnSubmit from '@/components/BtnSubmit.vue'
+import PermissionField from '@/components/PermissionField.vue'
 
 const submit = () => {
   //
 }
-
-const formStatusWithHeader = ref(true)
 
 const formStatusCurrent = ref(0)
 
@@ -59,253 +23,174 @@ const formStatusSubmit = () => {
     ? formStatusCurrent.value + 1
     : 0
 }
+
+const showForm = reactive({
+  novoFornecedor: false,
+});
+
+const toggleForm = () => {
+  showForm.novo = !showForm.novo;
+};
 </script>
 
 <template>
-  <LayoutAuthenticated >
-    <SectionMain class="w-100">
-      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Cadastro de Cliente" main>
-
+  <LayoutAuthenticated>
+    <SectionMain>
+      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Cadastro de Usuário" main>
+        <BaseButton v-if="!showForm.novo" @click="toggleForm" label="Novo Usuário" color="success" :icon="mdiAccountPlus"/>
+        <BaseButton v-else @click="toggleForm" label="Ver Usuários" color="info" :icon="mdiAccountEye"/>
       </SectionTitleLineWithButton>
 
-      <CardBox has-table>
+      <CardBox v-if="!showForm.novo" has-table>
         <TableSampleClients />
       </CardBox>
 
-      <CardBox form @submit.prevent="submit" >
-        <div class="w-1/2 mx-auto">
-            <FormKit type="form" :actions="false" >
-            <FormKit type="multi-step" tab-style="progress" :allow-incomplete="false">
-              <FormKit type="step" name="contactInformation" label="Informações Principais">
-                <!-- collect name, email, and company info -->
-                <FormKit
-                  type="select"
-                  label="Pessoa"
-                  prefix-icon="people"
-                  placeholder="Selecione o Tipo de Pessoa"
-                  name="tipo_pessoa"
-                  :options="{
-                    fisica: 'Física',
-                    juridica: 'Jurídica',
-                    estrangeiro: 'Estrangeiro(a)',
-                  }"
-                  validation="required"
-                  validation-visibility="dirty"
-                />
-                <FormKit type="text" label="CPF / CNPJ / Documento"/>
-                <FormKit type="text" label="Razão Social / Nome" validation="required"/>
-                <FormKit type="text" label="Apelido / Nome Fantasia"/>
-                <FormKit type="date" label="Data de Nascimento"/>
-                <FormKit type="text" label="RG"/>
-                <FormKit type="text" label="Insc.Estadual"/>
-                <FormKit type="text" label="Insc.Municipal"/>
-                <FormKit type="text" label="Nacionalidade"/>
-              </FormKit>
+      <CardBox form v-if="showForm.novo" @submit.prevent="submit" >
+        <Vueform>
+          <template #empty>
+            <FormTabs class="overflow-x-auto text-base sm:text-sm md:text-base lg:text-lg whitespace-nowrap">
+              <FormTab name="informacoes_principais" label="Informações Principais"
+                :elements="['nome', 'email_acesso', 'senha_acesso', 'status_acesso', 'button_submit']"
+                :columns="{ sm: 12, md: 6, lg: 4 }" />
 
-              <FormKit type="step" name="endereco" label="Endereços">
-                <!-- Get talk title, brief, and track -->
-                <FormKit type="text" label="CEP" validation="required" />
-                <FormKit type="text" label="Logradouro" validation="required" />
-                <FormKit type="text" label="Nº" validation="required" />
-                <FormKit type="text" label="Bairro" validation="required" />
-                <FormKit type="text" label="Complemento"/>
-                <FormKit type="text" label="Cidade" validation="required" />
-                <FormKit type="text" label="IBGE Cidade"/>
-                <FormKit type="text" label="UF" validation="required" />
-                <FormKit type="text" label="Pais" validation="required" value="Brasil"/>
-                <FormKit type="text" label="IBGE Pais" value="1058"/>
-                <FormKit
-                  type="select"
-                  label="Tipo de Endereço"
-                  placeholder="Selecione o Tipo de Endereço"
-                  name="tipo_endereco"
-                  :options="{
-                    padrao: 'Padrão',
-                    entrega: 'Entrega',
-                    coleta: 'Coleta',
-                    redespacho: 'Redespacho',
-                    cobranca: 'Cobrança',
-                    retorno: 'Retorno',
-                    internacional: 'Internacional',
-                  }"
-                  validation="required"
-                  validation-visibility="dirty"
-                />
-              </FormKit>
+              <FormTab name="permissoes" label="Permissões"
+                :elements="['permissoes_list', 'button_submit']"
+                :columns="{ sm: 12, md: 6, lg: 4 }" />
+            </FormTabs>
 
-              <FormKit type="step" name="outros_dados" label="Outros Dados">
-                <!-- Get talk title, brief, and track -->
-                <FormKit type="email" label="E-mail Principal" validation="required|email" prefix-icon="email" />
-                <FormKit type="email" label="E-mail Financeiro" validation="required|email" prefix-icon="email" />
-                <FormKit type="email" label="E-mail NFe" validation="required|email" prefix-icon="email" />
 
-                  <FormCheckRadioGroup
-                    v-model="customElementsForm.switch"
-                    name="sample-switch"
-                    type="switch"
-                    :options="{ one: 'Notificações por e-mail (E-mail Principal)'}"
-                  />
+            <FormElements>
+              <!-- Início Informações Principais-->
+                <TextElement name="nome" label="Nome" rules="required" :messages="{ required: 'Por favor, insira um nome' }" :columns="6" />
 
-                  <BaseDivider />
+                <TextElement name="email_acesso" label="E-mail para Acesso" input-type="email" rules="required" :messages="{ required: 'Por favor, insira um e-mail' }" :columns="6" />
 
-                <FormKit
-                  type="tel"
-                  label="Telefone"
-                  prefix-icon="telephone"
-                  placeholder="(xx) xxxxx-xxxx"
-                  validation="matches:^\([0-9]{2}\) [0-9][0-9]{4,4}-[0-9]{4}$"
-                  :validation-messages="{
-                    matches: 'O número de telefone deve ter o seguinte formato: (XX) XXXXX-XXXXX',
-                  }"
-                  validation-visibility="dirty"
-                />
+                <TextElement name="senha_acesso" label="Senha de Acesso" input-type="password" rules="required" :messages="{ required: 'Por favor, insira uma senha' }" :columns="6" />
 
-                <FormKit
-                  type="tel"
-                  label="Whatsapp"
-                  prefix-icon="whatsapp"
-                  placeholder="(xx) xxxxx-xxxx"
-                  validation="matches:^\([0-9]{2}\) [0-9][0-9]{4,4}-[0-9]{4}$"
-                  :validation-messages="{
-                    matches: 'O número de whatsapp deve ter o seguinte formato: (XX) XXXXX-XXXXX',
-                  }"
-                  validation-visibility="dirty"
-                />
+                <SelectElement name="status_acesso" label="Status de Acesso" rules="required" :messages="{ required: 'Por favor, selecione uma Opção' }" default="Ativo" :native="false" :items="[
+                  'Ativo',
+                  'Inativo'
+                ]" :columns="6" />
+              <!-- Fim Informações Principais-->
 
-                <FormKit
-                  type="select"
-                  label="Condição de Pagamento"
-                  prefix-icon="mastercard"
-                  placeholder="Selecione a Condição de Pagamento"
-                  name="condicao_pagamento"
-                  :options="{
-                    a_vista: 'Á Vista - Carteira',
-                    boleto: 'Boleto',
-                  }"
-                  validation-visibility="dirty"
-                />
+              <!-- Início Permissões-->
+              <GroupElement name="permissoes_list">
+                <StaticElement :attrs="{ class: 'bg-teal-500 text-center rounded-sm p-1 text-white' }" tag="h3" content="Todos" />
+                  <CheckboxElement name="todos" text="Marcar Todas Permissões"/>
 
-                <FormKit
-                  type="select"
-                  label="Tipos de Pagamentos"
-                  placeholder="Selecione o tipo de Pagamento"
-                  name="regiao"
-                  :options="{
-                    dinheiro: 'Dinheiro',
-                    boleto: 'Boleto',
-                    duplicata: 'Duplicata',
-                    cheque: 'Cheque',
-                    cartao_debito: 'Cartão Débito',
-                    cartao_credito: 'Cartão Credito',
-                    pix: 'Pix'
-                  }"
-                  validation-visibility="dirty"
-                />
+                <StaticElement :attrs="{ class: 'bg-teal-500 text-center rounded-sm p-1 text-white' }" tag="h3" content="Cadastro" />
+                  <StaticElement :attrs="{ class: 'bg-gray-400 text-center rounded-sm p-1 ' }" tag="p" content="Pessoas" />
+                    <CheckboxElement name="todos_cliente" text="Marcar Todos" :columns="12"/>
 
-                <FormKit
-                  type="select"
-                  label="Região"
+                    <PermissionField permissao_titulo="Clientes" permissao_name="clientes"/>
 
-                  placeholder="Selecione a Região"
-                  name="regiao"
-                  :options="{
-                    regiao: 'Limeira e Região',
-                  }"
-                  validation-visibility="dirty"
-                />
+                    <PermissionField permissao_titulo="Fornecedores" permissao_name="fornecedores"/>
 
-                <FormKit type="text" label="Região Suframa" />
-                <FormKit type="text" label="Cód. do EAN Comprador" />
+                    <PermissionField permissao_titulo="Fabricantes" permissao_name="fabricantes"/>
 
-                <FormKit
-                  type="select"
-                  label="Transportadoras"
-                  placeholder="Selecione a Transportadora"
-                  name="transportadora"
-                  :options="{
-                    transportadora1: 'Taubate transportes',
-                  }"
-                  validation-visibility="dirty"
-                />
+                    <PermissionField permissao_titulo="Vendedores" permissao_name="vendedores"/>
 
-              </FormKit>
+                    <PermissionField permissao_titulo="Funcionários" permissao_name="funcionarios"/>
 
-              <FormKit type="step" name="referral" label="Configurações">
-                <FormKit
-                  type="select"
-                  label="Situação"
-                  placeholder="Selecione a Situação"
-                  name="situacao"
-                  :options="{
-                    ativo: 'Ativo',
-                    inativo: 'Inativo',
-                    prospect: 'Prospect',
-                  }"
-                  validation="required"
-                  validation-visibility="dirty"
-                />
+                    <PermissionField permissao_titulo="Usuários" permissao_name="usuarios"/>
 
-                <FormKit
-                  type="select"
-                  label="Tipo Contribuinte"
-                  placeholder="Selecione o tipo de Contribuinte"
-                  name="tipo_contribuinte"
-                  :options="{
-                    nao_contribuinte: 'Não contribuinte que pode ou não possuir Inscrição Estadual',
-                    contribuinte_isento: 'Contribuinte Isento de Inscrição',
-                    contribuinte_icms: 'Contribuinte ICMS',
-                  }"
-                  validation="required"
-                  validation-visibility="dirty"
-                />
+                    <PermissionField permissao_titulo="Bancos" permissao_name="bancos"/>
 
-                <FormKit
-                  type="select"
-                  label="Finalidade Faturamento"
-                  placeholder="Selecione a Finalidade de Faturamento"
-                  name="finalidade_faturamento"
-                  :options="{
-                    revenda: 'Revenda',
-                    consumo: 'Consumo',
-                    amostra: 'Amostra',
-                    devolucao_compra_revenda: 'Devolução de Compra para Revenda (à Fornecedor)',
-                    devolucao_compra_industrializacao: 'Devolução de Compra para Industrialização (à Fornecedor)',
-                    bonificacao_cliente: 'Bonificação ao Cliente',
-                    industrializacao_cliente: 'Industrialização ao Cliente',
-                    remessa_industrializacao: 'Remessa para Industrialização (à Fornecedor)',
-                    remessa_conserto: 'Remessa para Conserto (à Fornecedor)',
-                    retorno_industrializacao: 'Retorno de Industrialização (ao Cliente)',
-                    retorno_conserto: 'Retorno de Conserto (ao Cliente)',
-                    nf_complementar_cliente: 'NF Complementar à Cliente',
-                    nf_complementar_fornecedor: 'NF Complementar à Fornecedor',
-                    remessa_demonstracao_cliente: 'Remessa em Demonstração (ao Cliente)',
-                    remessa_demonstracao_fornecedor: 'Remessa em Demonstração (ao Fornecedor)',
-                    devolucao_compra: 'Devolução de Compra para consumo',
-                  }"
-                  validation-visibility="dirty"
-                />
+                    <PermissionField permissao_titulo="Preço Individual / Cliente" permissao_name="preco"/>
 
-                <FormKit type="number" label="Alíquota Carga Tributária Média" />
+                    <PermissionField permissao_titulo="Cargo" permissao_name="cargo"/>
 
-                <FormKit
-                  type="select"
-                  label="Plano de Contas"
-                  placeholder="Selecione o plano de contas"
-                  name="plano_contas"
-                  :options="{
-                    venda: 'Venda à Vista',
+                    <PermissionField permissao_titulo="Básico" permissao_name="basico"/>
 
-                  }"
-                  validation-visibility="dirty"
-                />
+                  <StaticElement :attrs="{ class: 'bg-gray-400 text-center rounded-sm p-1 ' }" tag="p" content="Produtos e Serviços" />
+                    <CheckboxElement name="todos_produtos_servicos" text="Marcar Todos" :columns="12"/>
 
-                <template #stepNext>
-                  <FormKit type="submit" />
-                </template>
-              </FormKit>
-            </FormKit>
-          </FormKit>
-        </div>
+                      <PermissionField permissao_titulo="Produtos" permissao_name="produtos"/>
+
+                      <PermissionField permissao_titulo="Matérias-Primas" permissao_name="materia_prima"/>
+
+                      <PermissionField permissao_titulo="SubProdutos" permissao_name="sub_produtos"/>
+
+                      <PermissionField permissao_titulo="Materiais Internos" permissao_name="materiais_internos"/>
+
+                      <PermissionField permissao_titulo="Serviços" permissao_name="servicos"/>
+
+                      <PermissionField permissao_titulo="Ativos Fixos" permissao_name="ativos_fixos"/>
+
+                      <PermissionField permissao_titulo="Unidades de Medida" permissao_name="unidades_medida"/>
+
+                      <PermissionField permissao_titulo="Marcas" permissao_name="marcas"/>
+
+                  <StaticElement :attrs="{ class: 'bg-gray-400 text-center rounded-sm p-1 ' }" tag="p" content="Financeiro" />
+                    <CheckboxElement name="todos_financeiro" text="Marcar Todos" :columns="12"/>
+
+                      <PermissionField permissao_titulo="Tipo de Pagamento" permissao_name="tipo_pagamento"/>
+
+                      <PermissionField permissao_titulo="Contas Bancárias" permissao_name="contas_bancarias"/>
+
+                      <PermissionField permissao_titulo="Operações Bancárias" permissao_name="operacoes_bancarias"/>
+
+                      <PermissionField permissao_titulo="Departamento" permissao_name="departamento"/>
+
+                      <PermissionField permissao_titulo="Condições de Pagamento" permissao_name="condicoes"/>
+
+                      <PermissionField permissao_titulo="Planos de Contas" permissao_name="plano_contas"/>
+
+                      <PermissionField permissao_titulo="Centros de Custos" permissao_name="centro_custos"/>
+
+                      <PermissionField permissao_titulo="Configuração de Boleto" permissao_name="config_boleto"/>
+
+                  <StaticElement :attrs="{ class: 'bg-gray-400 text-center rounded-sm p-1 ' }" tag="p" content="Fiscal - Cadastros" />
+                    <CheckboxElement name="todos_financeiro" text="Marcar Todos" :columns="12"/>
+
+                      <PermissionField permissao_titulo="Finalidade" permissao_name="finalidade"/>
+
+                      <PermissionField permissao_titulo="Perfil de Produtos" permissao_name="perfil_produtos"/>
+
+                      <PermissionField permissao_titulo="Tipos de Notas Fiscais" permissao_name="tipos_nf"/>
+
+                      <PermissionField permissao_titulo="CFOP" permissao_name="cfop"/>
+
+                      <PermissionField permissao_titulo="CEST" permissao_name="cest"/>
+
+                      <PermissionField permissao_titulo="NCM" permissao_name="ncm"/>
+
+                      <PermissionField permissao_titulo="CSOSN" permissao_name="csosn"/>
+
+                      <PermissionField permissao_titulo="ICMS Origem" permissao_name="icms_origem"/>
+
+                      <PermissionField permissao_titulo="ICMS CST" permissao_name="icms_cst"/>
+
+                      <PermissionField permissao_titulo="ICMS Modalidade BC" permissao_name="icms_modalidade_bc"/>
+
+                      <PermissionField permissao_titulo="ICMS Modalidade ST" permissao_name="icms_modalidade_st"/>
+
+                      <PermissionField permissao_titulo="IPI Operação" permissao_name="ipi_operacao"/>
+
+                      <PermissionField permissao_titulo="ICMS Desoneração" permissao_name="icms_desoneracao"/>
+
+                      <PermissionField permissao_titulo="ICMS Benef. Fiscal" permissao_name="icms_benef_fiscal"/>
+
+                      <PermissionField permissao_titulo="IPI CST" permissao_name="ipi_cst"/>
+
+                      <PermissionField permissao_titulo="IPI Enquadr. Legal" permissao_name="ipi_enquadr_legal"/>
+
+                      <PermissionField permissao_titulo="PIS CST" permissao_name="pis_cst"/>
+
+                      <PermissionField permissao_titulo="COFINS CST" permissao_name="cofins_cst"/>
+
+                      <PermissionField permissao_titulo="SPED ICMS/IPI - Tipo de Item" permissao_name="sped_icms_ipi"/>
+
+                      <PermissionField permissao_titulo="CNAE" permissao_name="cnae"/>
+
+                      <PermissionField permissao_titulo="Origem de Produtos" permissao_name="origem_produtos"/>
+              </GroupElement>
+
+              <!--Fim Permissões-->
+              <BtnSubmit/>
+            </FormElements>
+          </template>
+        </Vueform>
       </CardBox>
     </SectionMain>
   </LayoutAuthenticated>
